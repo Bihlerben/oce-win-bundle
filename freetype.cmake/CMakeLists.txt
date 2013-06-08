@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 ###### FreeType
 PROJECT(freetype)
@@ -56,21 +56,10 @@ SET ( FT_MODULES
     ${FT_DIR}/src/winfonts/winfnt.c
     )
 
-ADD_LIBRARY(freetype ${FT_SOURCE_FILES} ${FT_MODULES} )
+ADD_LIBRARY(freetype ${OCEBUNDLE_ADD_LIB_PREFIX} ${FT_SOURCE_FILES} ${FT_MODULES} )
 
 FILE(GLOB freetype_headers "${FT_DIR}/include/*.*")
 FILE(GLOB freetype_headers_ft "${FT_DIR}/include/freetype/*.*")
 FILE(GLOB_RECURSE freetype_headers_config "${FT_DIR}/include/freetype/config/*.*")
 FILE(GLOB_RECURSE freetype_headers_int "${FT_DIR}/include/freetype/internal/*.*")
 
-INSTALL (FILES ${freetype_headers} DESTINATION ${OCE_WIN_BUNDLE_INSTALL_DIR}/include/freetype )
-INSTALL (FILES ${freetype_headers_ft} DESTINATION ${OCE_WIN_BUNDLE_INSTALL_DIR}/include/freetype/freetype )
-INSTALL (FILES ${freetype_headers_config} DESTINATION ${OCE_WIN_BUNDLE_INSTALL_DIR}/include/freetype/freetype/config )
-INSTALL (FILES ${freetype_headers_int} DESTINATION ${OCE_WIN_BUNDLE_INSTALL_DIR}/include/freetype/freetype/internal )
-
-
-INSTALL(TARGETS freetype
-		ARCHIVE DESTINATION  "${OCE_WIN_BUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
-		LIBRARY DESTINATION  "${OCE_WIN_BUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
-		RUNTIME DESTINATION  "${OCE_WIN_BUNDLE_INSTALL_DIR_BITS}/bin/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
-		)

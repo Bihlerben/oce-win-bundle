@@ -22,12 +22,5 @@ LIST(REMOVE_ITEM zlib_files "${LIBPNG_DIR}/pngtest.c")
 IF(WIN32)
     LINK_LIBRARIES("opengl32")
 ENDIF()
-ADD_LIBRARY (gl2ps ${GL2PS_DIR}/gl2ps.c ${png_files} ${zlib_files})
+ADD_LIBRARY (gl2ps ${OCEBUNDLE_ADD_LIB_PREFIX} ${GL2PS_DIR}/gl2ps.c ${png_files} ${zlib_files})
 
-INSTALL(FILES ${GL2PS_DIR}/gl2ps.h DESTINATION ${OCE_WIN_BUNDLE_INSTALL_DIR}/include/gl2ps)
-
-INSTALL(TARGETS gl2ps
-		ARCHIVE DESTINATION  "${OCE_WIN_BUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
-		LIBRARY DESTINATION  "${OCE_WIN_BUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
-		RUNTIME DESTINATION  "${OCE_WIN_BUNDLE_INSTALL_DIR_BITS}/bin/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
-		)
