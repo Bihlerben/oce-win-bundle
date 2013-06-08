@@ -21,11 +21,7 @@ else ()
     set(BIT 32)
 endif()
 
-if (WIN32)
-    set(ep_install_dir_bits "${ep_install_dir}/Win${BIT}")
-else ()
-    set(ep_install_dir_bits "${ep_install_dir}")
-endif ()
+set(ep_install_dir_bits "${ep_install_dir}")
 
 # Set the default build type---this will affect all libraries and
 # applications
@@ -48,6 +44,7 @@ set(ep_common_args
   -DCMAKE_BUILD_TYPE:BOOL=${build_type}
   -DOCE_WIN_BUNDLE_INSTALL_DIR:PATH=${ep_install_dir}
   -DOCE_WIN_BUNDLE_INSTALL_DIR_BITS:PATH=${ep_install_dir_bits}
+  -DCMAKE_DEBUG_POSTFIX:STRING=d
 )
 
 # Compute -G arg for configuring external projects with the same CMake generator:
@@ -72,21 +69,17 @@ IF(NOT DEFINED FREETYPE_DIR)
         -DFT_DIR:STRING=${ep_base}/Source/${proj}
     )
 
-    add_custom_command(
-      OUTPUT ${ep_base}/Source/${proj}/CMakeLists.txt
+   ExternalProject_Add_Step( freetype copy_CmakeLists
+      COMMENT "Copying CMakeLists.txt file..."
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../${proj}.cmake/CMakeLists.txt ${ep_base}/Source/${proj}/CMakeLists.txt
       DEPENDS ${CMAKE_SOURCE_DIR}/../${proj}.cmake/CMakeLists.txt
+      DEPENDEES download
       )
-    add_custom_command(
-      OUTPUT ${ep_base}/Source/${proj}/freetype.def
+   ExternalProject_Add_Step(freetype copy_Def
+      COMMENT "Copying freetype file..."
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../${proj}.cmake/freetype.def ${ep_base}/Source/${proj}/freetype.def
       DEPENDS ${CMAKE_SOURCE_DIR}/../${proj}.cmake/freetype.def
-      )
-    ExternalProject_Add_Step(${proj} update_build_system
-      COMMENT "Updating build system"
-      DEPENDS ${ep_base}/Source/${proj}/CMakeLists.txt ${ep_base}/Source/${proj}/freetype.def
-      DEPENDERS configure
-      ALWAYS OFF
+	  DEPENDEES download
       )
 
     set(FREETYPE_DIR "${ep_build_dir}/${proj}")
@@ -105,20 +98,16 @@ IF(NOT DEFINED FREEIMAGE_DIR)
       CMAKE_ARGS
         ${ep_common_args}
         -DFREEIMAGE_DIR:STRING=${ep_base}/Source/${proj}
+		-DLIBPNG_DIR:STRING=${ep_base}/Source/FreeImage/Source/LibPNG
+        -DZLIB_DIR:STRING=${ep_base}/Source/FreeImage/Source/ZLib
     )
 
-    add_custom_command(
-      OUTPUT ${ep_base}/Source/${proj}/CMakeLists.txt
+   ExternalProject_Add_Step( FreeImage copy_CmakeLists
+      COMMENT "Copying CMakeLists.txt file..."
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../${proj}.cmake/CMakeLists.txt ${ep_base}/Source/${proj}/CMakeLists.txt
       DEPENDS ${CMAKE_SOURCE_DIR}/../${proj}.cmake/CMakeLists.txt
+      DEPENDEES download
       )
-    ExternalProject_Add_Step(${proj} update_build_system
-      COMMENT "Updating build system"
-      DEPENDS ${ep_base}/Source/${proj}/CMakeLists.txt
-      DEPENDERS configure
-      ALWAYS OFF
-      )
-
     set(FREEIMAGE_DIR "${ep_build_dir}/${proj}")
 
 ENDIF()
@@ -131,7 +120,6 @@ IF(NOT DEFINED GL2PS_DIR)
     ExternalProject_Add(${proj}
       URL http://geuz.org/gl2ps/src/gl2ps-1.3.8.tgz
       URL_MD5 05ae306fdad00a24ffcabf47d8ae363e
-      PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../${proj}.cmake/CMakeLists.txt ${ep_base}/Source/${proj}/CMakeLists.txt
       UPDATE_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
@@ -141,6 +129,13 @@ IF(NOT DEFINED GL2PS_DIR)
         -DLIBPNG_DIR:STRING=${ep_base}/Source/FreeImage/Source/LibPNG
         -DZLIB_DIR:STRING=${ep_base}/Source/FreeImage/Source/ZLib
     )
+
+	ExternalProject_Add_Step( gl2ps copy_CmakeLists
+      COMMENT "Copying CMakeLists.txt file..."
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/../${proj}.cmake/CMakeLists.txt ${ep_base}/Source/${proj}/CMakeLists.txt
+      DEPENDS ${CMAKE_SOURCE_DIR}/../${proj}.cmake/CMakeLists.txt
+      DEPENDEES download
+      )
 
     set(GL2PS_DIR "${ep_build_dir}/${proj}")
 
@@ -157,8 +152,8 @@ ExternalProject_Add(oce
   CMAKE_ARGS
     ${ep_common_args}
     -DOCE_INSTALL_PREFIX:PATH=${ep_install_dir}
-    -DFREETYPE_DIR:FILEPATH=${FREETYPE_DIR}
-    -DFREEIMAGE_DIR:FILEPATH=${FREEIMAGE_DIR}
+    -DFREETYPE_DIR:FILEPATH=${ep_install_dir_bits}
+    -DFREEIMAGE_DIR:FILEPATH=${ep_install_dir_bits}
     -DFTGL_DIR:FILEPATH=${FTGL_DIR}
     -DGL2PS_DIR:FILEPATH=${GL2PS_DIR}
     -DOCE_DRAW:BOOL=ON
@@ -167,4 +162,5 @@ ExternalProject_Add(oce
     -DOCE_WITH_GL2PS:BOOL=ON
   DEPENDS
     freetype FreeImage gl2ps
+  STEP_TARGETS configure
 )

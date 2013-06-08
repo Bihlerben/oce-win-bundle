@@ -1,3 +1,5 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
 ###### FreeType
 PROJECT(freetype)
 INCLUDE_DIRECTORIES(${FT_DIR}/include)
