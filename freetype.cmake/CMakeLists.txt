@@ -58,8 +58,21 @@ SET ( FT_MODULES
 
 ADD_LIBRARY(freetype ${OCEBUNDLE_ADD_LIB_PREFIX} ${FT_SOURCE_FILES} ${FT_MODULES} )
 
-FILE(GLOB freetype_headers "${FT_DIR}/include/*.*")
-FILE(GLOB freetype_headers_ft "${FT_DIR}/include/freetype/*.*")
-FILE(GLOB_RECURSE freetype_headers_config "${FT_DIR}/include/freetype/config/*.*")
-FILE(GLOB_RECURSE freetype_headers_int "${FT_DIR}/include/freetype/internal/*.*")
+IF(OCEBUNDLE_AUTO_INSTALL)
+	# FreeType install
+  FILE(GLOB freetype_headers "${FT_DIR}/include/*.*")
+  FILE(GLOB freetype_headers_ft "${FT_DIR}/include/freetype/*.*")
+  FILE(GLOB_RECURSE freetype_headers_config "${FT_DIR}/include/freetype/config/*.*")
+  FILE(GLOB_RECURSE freetype_headers_int "${FT_DIR}/include/freetype/internal/*.*")
 
+  INSTALL (FILES ${freetype_headers} DESTINATION ${OCEBUNDLE_INSTALL_DIR}/include/freetype )
+  INSTALL (FILES ${freetype_headers_ft} DESTINATION ${OCEBUNDLE_INSTALL_DIR}/include/freetype/freetype )
+  INSTALL (FILES ${freetype_headers_config} DESTINATION ${OCEBUNDLE_INSTALL_DIR}/include/freetype/freetype/config )
+  INSTALL (FILES ${freetype_headers_int} DESTINATION ${OCEBUNDLE_INSTALL_DIR}/include/freetype/freetype/internal )
+
+  INSTALL(TARGETS freetype
+    ARCHIVE DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+    LIBRARY DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+    RUNTIME DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/bin/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+    )
+ENDIF()

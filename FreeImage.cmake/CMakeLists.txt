@@ -89,10 +89,27 @@ ADD_LIBRARY (FreeImage ${OCEBUNDLE_ADD_LIB_PREFIX} ${png_files} ${zlib_files} ${
 FILE(GLOB freeimage_headers ${FREEIMAGE_DIR}/Source/*.h)
 FILE(GLOB fip_headers ${FREEIMAGE_DIR}/Wrapper/FreeImagePlus/*.h)
 
-
 # FreeImagePlus
 FILE(GLOB freeimagelib_files ${FREEIMAGE_DIR}/Source/FreeImageLib/*.cpp)
 LIST(REMOVE_ITEM freeimage_plus_files "${FREEIMAGE_DIR}/Wrapper/FreeImagePlus/src/FreeImagePlus.cpp")
 
 ADD_LIBRARY (FreeImagePlus ${OCEBUNDLE_ADD_LIB_PREFIX} ${freeimage_plus_files})
 TARGET_LINK_LIBRARIES(FreeImagePlus FreeImage)
+
+# INSTALL
+IF(OCEBUNDLE_AUTO_INSTALL)
+	
+	INSTALL(FILES ${fip_headers} ${freeimage_headers} DESTINATION ${OCEBUNDLE_INSTALL_DIR}/include/FreeImage)
+	
+	INSTALL(TARGETS FreeImage
+			ARCHIVE DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+			LIBRARY DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+			RUNTIME DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/bin/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+			)
+	
+	INSTALL(TARGETS FreeImagePlus
+			ARCHIVE DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+			LIBRARY DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/lib/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+			RUNTIME DESTINATION  "${OCEBUNDLE_INSTALL_DIR_BITS}/bin/" CONFIGURATIONS Debug Release MinSizeRel RelWithDebInfo
+			)
+ENDIF()
